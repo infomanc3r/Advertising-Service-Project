@@ -13,11 +13,11 @@ public class AmazonIdentityServiceTest {
 
     private static final String TEST_FILE_PATH = "./tst/resources/customers.txt";
 
-    private AmazonIdentityService serviceUnderTest;
+    private com.amazon.ata.resources.debugging.dependencies.AmazonIdentityService serviceUnderTest;
 
     @BeforeEach
     public void setup() {
-        serviceUnderTest = new AmazonIdentityService(new File(TEST_FILE_PATH));
+        serviceUnderTest = new com.amazon.ata.resources.debugging.dependencies.AmazonIdentityService(new File(TEST_FILE_PATH));
     }
 
     @Test
