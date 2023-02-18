@@ -66,28 +66,29 @@ public class AdvertisementSelectionLogic {
 
         final List<AdvertisementContent> ads = contentDao.get(marketplaceId);
 
-        if (marketplaceId == null || marketplaceId.equals("") || customerId.equals("db")) {
+        if (marketplaceId == null || marketplaceId.equals("")) {
             return selectedContent;
         }
 
-        if (ads.size() == 1) {
-            return new GeneratedAdvertisement(ads.get(0));
-        } else if (ads.size() > 1) {
-            return new GeneratedAdvertisement(ads.get(random.nextInt(ads.size())));
-        }
+//        if (ads.size() == 1) {
+//            return new GeneratedAdvertisement(ads.get(0));
+//        } else if (ads.size() > 1) {
+//            return new GeneratedAdvertisement(ads.get(random.nextInt(ads.size())));
+//        }
 
-//        List<AdvertisementContent> filteredContent = ads.stream()
-//                .filter(targetingGroupList -> targetingGroupDao.get(targetingGroupList.getContentId())
-//                        .stream()
-//                        .map(targetingEvaluator::evaluate)
-//                        .anyMatch(TargetingPredicateResult::isTrue))
-//                .collect(Collectors.toList());
-//
-//        if (CollectionUtils.isNotEmpty(filteredContent)) {
-//                AdvertisementContent randomAdvertisementContent =
-//                        filteredContent.get(random.nextInt(filteredContent.size()));
-//                selectedContent = new GeneratedAdvertisement(randomAdvertisementContent);
-//            }
+        List<AdvertisementContent> filteredContent = ads.stream()
+                .filter(targetingGroupList ->
+                        targetingGroupDao.get(targetingGroupList.getContentId())
+                        .stream()
+                        .map(targetingEvaluator::evaluate)
+                        .anyMatch(TargetingPredicateResult::isTrue))
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(filteredContent)) {
+                AdvertisementContent randomAdvertisementContent =
+                        filteredContent.get(random.nextInt(filteredContent.size()));
+                selectedContent = new GeneratedAdvertisement(randomAdvertisementContent);
+            }
 
         return selectedContent;
 
