@@ -66,28 +66,34 @@ public class AdvertisementSelectionLogic {
 
         final List<AdvertisementContent> ads = contentDao.get(marketplaceId);
 
+        TreeMap<Double, AdvertisementContent> contentMap = new TreeMap<>();
+
         if (marketplaceId == null || marketplaceId.equals("")) {
             return selectedContent;
         }
 
-//        if (ads.size() == 1) {
-//            return new GeneratedAdvertisement(ads.get(0));
-//        } else if (ads.size() > 1) {
-//            return new GeneratedAdvertisement(ads.get(random.nextInt(ads.size())));
-//        }
+        ads.stream()
+                .forEach(advertisementContent -> {
+                    targetingGroupDao.get(advertisementContent.getContentId()).stream()
+                            .forEach(targetingGroup -> {
+                                TargetingPredicateResult result = targetingEvaluator.evaluate(targetingGroup);
+                                if(result.isTrue()) {
+                                    contentMap.put(targetingGroup.getClickThroughRate(), advertisementContent);
+                                }
+                            });
+                });
 
-        List<AdvertisementContent> filteredContent = ads.stream()
-                .filter(targetingGroupList ->
-                        targetingGroupDao.get(targetingGroupList.getContentId())
-                        .stream()
-                        .map(targetingEvaluator::evaluate)
-                        .anyMatch(TargetingPredicateResult::isTrue))
-                .collect(Collectors.toList());
+//        List<AdvertisementContent> filteredContent = ads.stream()
+//                .filter(targetingGroupList ->
+//                        targetingGroupDao.get(targetingGroupList.getContentId())
+//                        .stream()
+//                        .map(targetingEvaluator::evaluate)
+//                        .anyMatch(TargetingPredicateResult::isTrue))
+//                .collect(Collectors.toList());
 
-        if (CollectionUtils.isNotEmpty(filteredContent)) {
-                AdvertisementContent randomAdvertisementContent =
-                        filteredContent.get(random.nextInt(filteredContent.size()));
-                selectedContent = new GeneratedAdvertisement(randomAdvertisementContent);
+        if (contentMap.size() > 0) {
+                AdvertisementContent selectedAd = contentMap.get(contentMap.lastKey());
+                selectedContent = new GeneratedAdvertisement(selectedAd);
             }
 
         return selectedContent;
@@ -118,11 +124,6 @@ public class AdvertisementSelectionLogic {
 //        }
 //
 //        return generatedAdvertisement;
-
-
-
-
-
 
     }
 }
