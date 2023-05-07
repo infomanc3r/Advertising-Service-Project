@@ -79,6 +79,7 @@ public class AdvertisementSelectionLogicTest {
 
     @Test
     public void selectAdvertisement_oneAd_returnsAd() {
+        // GIVEN
         List<AdvertisementContent> contents = Arrays.asList(CONTENT1);
         List<TargetingGroup> targetingGroupList = new ArrayList<>();
         TargetingGroup targetingGroup = new TargetingGroup();
@@ -92,15 +93,20 @@ public class AdvertisementSelectionLogicTest {
         when(targetingGroupDao.get(CONTENT_ID1)).thenReturn(targetingGroupList);
         when(targetingEvaluator.evaluate(any(TargetingGroup.class))).thenReturn(TargetingPredicateResult.TRUE);
 
+        // WHEN
         GeneratedAdvertisement ad = adSelectionService.selectAdvertisement(CUSTOMER_ID, MARKETPLACE_ID);
 
+        // THEN
         assertEquals(CONTENT_ID1, ad.getContent().getContentId());
     }
 
     @Test
     public void selectAdvertisement_multipleAds_returnsHighestClickthroughRate() {
+
+        // GIVEN
         List<AdvertisementContent> contents = Arrays.asList(CONTENT1, CONTENT2, CONTENT3);
         List<TargetingGroup> targetingGroupList1 = new ArrayList<>();
+
         TargetingGroup targetingGroup1 = new TargetingGroup();
         targetingGroup1.setClickThroughRate(.1);
         targetingGroup1.setContentId(CONTENT_ID1);
@@ -126,8 +132,10 @@ public class AdvertisementSelectionLogicTest {
         when(targetingGroupDao.get(CONTENT_ID3)).thenReturn(targetingGroupList3);
         when(targetingEvaluator.evaluate(any(TargetingGroup.class))).thenReturn(TargetingPredicateResult.TRUE);
 
+        // WHEN
         GeneratedAdvertisement ad = adSelectionService.selectAdvertisement(CUSTOMER_ID, MARKETPLACE_ID);
-
+        
+        // THEN
         assertEquals(CONTENT_ID2, ad.getContent().getContentId());
     }
 
